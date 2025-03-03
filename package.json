@@ -9,8 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "jotai": "^2.12.0",
-    "next": "15.1.7",
+    "bcrypt": "^5.1.1",
+    "cookie": "^1.0.2",
+    "jotai": "^2.12.1",
+    "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.10.1",
+    "next": "^15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

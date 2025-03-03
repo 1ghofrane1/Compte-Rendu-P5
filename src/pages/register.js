@@ -5,33 +5,39 @@ import styles from '@/styles/AuthForms.module.css';
 import { userAtom, authLoadingAtom } from '@/atoms/authAtoms';
 import Link from 'next/link';
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useAtom(authLoadingAtom);
   const [, setUser] = useAtom(userAtom);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       if (response.ok) {
-        setUser({ authenticated: true });
+        setUser({ authenticated: true }); // Met à jour l'atome Jotai
         router.push('/profile');
       } else {
         const errorData = await response.json();
-        console.error('Login échoué :', errorData);
-        alert(`Login échoué : ${errorData.message || 'Invalid credentials'}`);
+        console.error("Inscription échouée :", errorData);
+        alert(`Inscription échouée : ${errorData.message || 'Erreur inconnue'}`);
       }
     } catch (error) {
-      console.error('Erreur lors du login :', error);
-      alert('Erreur lors du login. Veuillez réessayer.');
+      console.error("Erreur lors de l'inscription :", error);
+      alert("Erreur lors de l'inscription. Veuillez réessayer.");
     } finally {
       setLoading(false);
     }
@@ -40,7 +46,7 @@ export default function Login() {
   return (
     <div className={styles.container}>
       <main className={styles.formContainer}>
-        <h1 className={styles.formTitle}>Connexion</h1>
+        <h1 className={styles.formTitle}>Inscription</h1>
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputGroup}>
             <label htmlFor="email">Email</label>
@@ -62,12 +68,29 @@ export default function Login() {
               required
             />
           </div>
-          <button type="submit" className={styles.submitButton} disabled={loading}>
-            Se Connecter
+          <div className={styles.inputGroup}>
+            <label htmlFor="confirmPassword">Confirmer le mot de passe</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={loading}
+          >
+            S'inscrire
           </button>
         </form>
         <p className={styles.formFooter}>
-          Pas de compte ? <Link href="/register" className={styles.link}>S’inscrire</Link>
+          Déjà un compte ?{' '}
+          <Link href="/login" className={styles.link}>
+            Se connecter
+          </Link>
         </p>
       </main>
     </div>

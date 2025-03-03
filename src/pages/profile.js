@@ -21,8 +21,8 @@ const ProfilePage = () => {
   return (
     <div className={styles.container}>
       <main className={styles.mainContent}>
-        <h1>Page de Profil</h1>
-        <p>Bienvenue, utilisateur connecté !</p>
+      <h1 className={styles.title}>Page de Profil</h1>
+      <p className={styles.description}>Bienvenue, utilisateur connecté !</p>
         {/* Afficher les informations de profil ici */}
       </main>
     </div>

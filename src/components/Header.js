@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import styles from '@/styles/Header.module.css';
+import styles from '@/components/Header.module.css';
 import { useAtom } from 'jotai';
 import { userAtom } from '@/atoms/authAtoms';
 import Cookies from 'js-cookie';
