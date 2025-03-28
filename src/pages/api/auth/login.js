@@ -31,14 +31,9 @@ export default async function handler(req, res) {
       // Générer JWT
       const token = generateToken(user);
 
+      res.setHeader('Set-Cookie', `authToken=${token}; HttpOnly; Path=/; Max-Age=3600; SameSite=Strict`);
       // Définir cookie HTTP-only
-      res.setHeader('Set-Cookie', cookie.serialize('authToken', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development', // En production, HTTPS uniquement
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 3600, // 1 heure en secondes
-      }));
+      
 
       return res.status(200).json({ message: 'Connexion réussie.' }); // Corrected status code to 200
     } catch (error) {

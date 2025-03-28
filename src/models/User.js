@@ -12,7 +12,6 @@ hashedPassword: {
 type: String,
 required: true,
  },
- // Vous pouvez ajouter d’autres champs comme le nom, prénom,
 
  }, {
 timestamps: true, // Ajoute createdAt et updatedAt
