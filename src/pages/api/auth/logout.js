@@ -1,16 +1,24 @@
 import cookie from 'cookie';
 
-export default async function handler (req, res) {
-    if (req.method === 'POST') {
-    // Effacer le cookie en définissant un cookie expiré
-    res.setHeader('Set-Cookie', cookie.serialize('authToken','', {
-    httpOnly: true,
-    secure:process.env.NODEENV !== 'development',
-    sameSite: 'strict',
-    path: '/',
-    maxAge: 0, // Définir maxAge a 0 pour expirer immédiatement
-    }));
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ message: 'Méthode non autorisée.' });
+    }
 
-    return res.status(200).json ({ message: 'Deconnexion reussie.' });
-    } else {
-    res.status(405).json ({ message: 'Methode non autorisee.' });}}
+    try {
+        // Supprimer le cookie en mettant maxAge à 0
+        res.setHeader('Set-Cookie', cookie.serialize('authToken', '', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            path: '/',
+            maxAge: 0,
+        }));
+
+        return res.status(200).json({ message: 'Déconnexion réussie.' });
+
+    } catch (error) {
+        console.error('Erreur lors de la déconnexion :', error);
+        return res.status(500).json({ message: 'Erreur serveur lors de la déconnexion.' });
+    }
+}

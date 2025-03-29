@@ -4,15 +4,52 @@ import { useRouter } from 'next/router';
 import styles from '@/styles/AuthForms.module.css';
 import { userAtom, authLoadingAtom } from '@/atoms/authAtoms';
 import Link from 'next/link';
+import * as Yup from 'yup';
+import {useFormik} from 'formik';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  //const [email, setEmail] = useState('');
+  //const [password, setPassword] = useState('');
   const [loading, setLoading] = useAtom(authLoadingAtom);
   const [, setUser] = useAtom(userAtom);
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  // ✅ Validation avec Yup
+  const validationSchema = Yup.object({
+    email: Yup.string().email('Email invalide').required('Email requis'),
+    password: Yup.string().min(6, 'Au moins 6 caractères').required('Mot de passe requis'),
+  });
+
+  // ✅ Formik pour gérer le formulaire
+  const formik = useFormik({
+    initialValues: { email: '', password: '' },
+    validationSchema,
+    onSubmit: async (values, { setErrors }) => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          setUser({ authenticated: true });
+          router.push('/profile');
+        } else {
+          setErrors({ email: data.message || 'Identifiants incorrects' });
+        }
+      } catch (error) {
+        console.error('Erreur lors du login :', error);
+        setErrors({ email: 'Une erreur est survenue. Réessayez.' });
+      } finally {
+        setLoading(false);
+      }
+    },
+  });
+
+  /*const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
@@ -35,33 +72,41 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-  };
+  };*/
 
   return (
     <div className={styles.container}>
       <main className={styles.formContainer}>
         <h1 className={styles.formTitle}>Connexion</h1>
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form onSubmit={formik.handleSubmit} className={styles.form}>
+
           <div className={styles.inputGroup}>
             <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              
+              {...formik.getFieldProps('email')}
+              className={formik.touched.email && formik.errors.email ? styles.inputError : ''}
             />
+            {formik.touched.email && formik.errors.email && (
+              <p className={styles.errorText}>{formik.errors.email}</p>
+            )}
           </div>
+
           <div className={styles.inputGroup}>
             <label htmlFor="password">Mot de passe</label>
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              {...formik.getFieldProps('password')}
+              className={formik.touched.password && formik.errors.password ? styles.inputError : ''}
             />
+            {formik.touched.password && formik.errors.password && (
+              <p className={styles.errorText}>{formik.errors.password}</p>
+            )}
           </div>
+
           <button type="submit" className={styles.submitButton} disabled={loading}>
             Se Connecter
           </button>

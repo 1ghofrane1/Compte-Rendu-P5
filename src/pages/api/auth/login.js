@@ -5,10 +5,12 @@ import dbConnect from '../../../utils/dbConnect';
 import User from '../../../models/User';
 import { generateToken } from '../../../utils/auth-utils';
 
-const JWTSECRET = process.env.JWTSECRETKEY; // Corrected this
+const JWT_SECRET_KEY = process.env.JWTSECRETKEY; // Corrected this
 
 export default async function handler(req, res) {
-  if (req.method === 'POST') {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Méthode non autorisée.' });
+  }
     await dbConnect(); // Se connecter à MongoDB
 
     const { email, password } = req.body;
@@ -38,9 +40,11 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: 'Connexion réussie.' }); // Corrected status code to 200
     } catch (error) {
       console.error('Erreur lors de la connexion :', error);
+
+      if (error.name === 'MongoError') {
+          return res.status(500).json({ message: 'Erreur MongoDB. Veuillez réessayer plus tard.' });
+      }
+
       return res.status(500).json({ message: 'Erreur serveur lors de la connexion.' });
-    }
-  } else {
-    res.status(405).json({ message: 'Méthode non autorisée.' }); // Handle unsupported methods
   }
 }
