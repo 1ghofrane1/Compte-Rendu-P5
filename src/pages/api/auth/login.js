@@ -5,8 +5,7 @@ import dbConnect from '../../../utils/dbConnect';
 import User from '../../../models/User';
 import { generateToken } from '../../../utils/auth-utils';
 
-const JWT_SECRET_KEY = process.env.JWTSECRETKEY; // Corrected this
-
+const JWT_SECRET = process.env.JWT_SECRET_KEY;
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Méthode non autorisée.' });
